@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vlog Archive</title>
+  <link rel="stylesheet" href=".././_res/css/responsive.css" />
+  <style>
+    body {
+      background-image: url(".././_res/img/bgimg.jpg");
+      background-size: cover;
+      background-position: center;
+      background-repeat: no-repeat;
+    }
+
+    .load-more-btn {
+      display: block;
+      margin: 20px auto;
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="container">
+    <header>
+      <h1>Vlog Archive</h1>
+      <p class="subheading">Collection of all my Vlogs.</p>
+      <a href="editContent.html" class="add-vlog-btn">Add New Vlog</a>
+    </header>
+    <div class="search-bar">
+      <input type="text" id="search-input" placeholder="Search vlogs..." />
+      <button id="search-button">Search</button>
+    </div>
+    <div class="card-container" id="card-container"></div>
+  </div>
+
+  <button id="load-more-btn" class="load-more-btn">Load More....</button>
+
+  <script>
+    const vlogs = JSON.parse(localStorage.getItem("vlogs")) || [];
+    const cardContainer = document.getElementById("card-container");
+    const searchInput = document.getElementById("search-input");
+    const searchButton = document.getElementById("search-button");
+    const loadMoreBtn = document.getElementById("load-more-btn");
+
+    let currentPage = 0; // Track the current page for pagination
+    const vlogsPerPage = 6; // Number of vlogs per "page"
+
+    function deleteVlog(index) {
+      vlogs.splice(index, 1);
+      localStorage.setItem("vlogs", JSON.stringify(vlogs));
+      renderVlogs();
+    }
+
+    function renderVlogs(vlogList = vlogs, page = 0) {
+      cardContainer.innerHTML = ""; // Clear previous content
+      const start = page * vlogsPerPage;
+      const end = start + vlogsPerPage;
+      const vlogsToShow = vlogList.slice(start, end); // Slice the vlog list to show only current "page"
+
+      vlogsToShow.forEach((vlog, index) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.dataset.id = start + index + 1;
+
+        const descriptionPreview = vlog.description
+          .split(" ")
+          .slice(0, 50)
+          .join(" ");
+
+        card.innerHTML = `
+            <div class="card-content">
+              <p class="card-author"><strong>Author:</strong> ${vlog.author || "Unknown"}</p>
+              <img class="card-image" src="${vlog.image || ".././_res/img/default-image.jpg"}" alt="Vlog Image" onerror="this.src='.././_res/img/isg_dummy_logo_icon.svg'" />
+              <h2 class="card-title" style="font-weight: ${vlog.titleFormat === "bold" ? "bold" : "normal"};
+                font-style: ${vlog.titleFormat === "italic" ? "italic" : "normal"};
+                text-decoration: ${vlog.titleFormat === "underline" ? "underline" : "none"};">
+                ${vlog.title} ${vlog.emoji || ""}
+              </h2>
+              <p class="card-description" style="font-family: ${vlog.fontStyle || "inherit"};">
+                ${descriptionPreview}${vlog.quote ? `\n"${vlog.quote}"` : ""}
+              </p>
+            </div>
+            <div class="card-buttons">
+              <button class="view-details-btn"><a href="viewContent.html?a=${index}" class="view-details-link">View</a></button>
+              <button class="delete-btn" onclick="deleteVlog(${start + index})">Delete</button>
+            </div>
+          `;
+        cardContainer.appendChild(card);
+      });
+
+      // Hide "Load More" button if we've displayed all vlogs
+      loadMoreBtn.style.display = end >= vlogList.length ? "none" : "block";
+    }
+
+    function loadMoreVlogs() {
+      currentPage++; // Go to the next page
+      renderVlogs(vlogs, currentPage); // Render only the next "page" of vlogs
+    }
+
+    function searchVlogs() {
+      const query = searchInput.value.toLowerCase();
+      const filteredVlogs = vlogs.filter(
+        (vlog) =>
+          vlog.title.toLowerCase().includes(query) ||
+          vlog.description.toLowerCase().includes(query) ||
+          (vlog.author && vlog.author.toLowerCase().includes(query))
+      );
+      currentPage = 0; // Reset to the first page of search results
+      renderVlogs(filteredVlogs, currentPage);
+    }
+
+    searchButton.addEventListener("click", searchVlogs);
+    searchInput.addEventListener("keypress", function (event) {
+      if (event.key === "Enter") {
+        searchVlogs();
+      }
+    });
+    loadMoreBtn.addEventListener("click", loadMoreVlogs);
+
+    // Initial render of the first page
+    renderVlogs(vlogs, currentPage);
+  </script>
+</body>
+
+</html>

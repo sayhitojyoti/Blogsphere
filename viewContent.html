@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>View Vlog</title>
+  <link rel="stylesheet" href=".././_res/CSS/view.css" />
+</head>
+
+<body>
+  <div class="container">
+    <div class="card">
+      <img class="card-image" id="vlog-image" src="" alt="Vlog Image" />
+      <div class="card-content">
+        <p class="card-author" id="vlog-author">Author Name</p>
+        <h2 class="card-title" id="vlog-title">Vlog Title</h2>
+        <p class="card-description" id="vlog-description">Vlog Description</p>
+        <a href="showcaseContent.html" class="card-btn">Go Back</a>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const vlogIndex = urlParams.get("a");
+    const vlogs = JSON.parse(localStorage.getItem("vlogs")) || [];
+    const vlog = vlogs[vlogIndex];
+
+    if (vlog) {
+      const vlogImage = document.getElementById("vlog-image");
+      vlogImage.src = vlog.image || ".././_res/img/default-image.jpg";
+      vlogImage.onerror = function () {
+        this.src = ".././_res/img/default-image.jpg";
+      };
+
+      const vlogTitle = document.getElementById("vlog-title");
+      vlogTitle.textContent = vlog.title + " " + (vlog.emoji || "");
+      vlogTitle.style.fontWeight =
+        vlog.titleFormat === "bold" ? "bold" : "normal";
+      vlogTitle.style.fontStyle =
+        vlog.titleFormat === "italic" ? "italic" : "normal";
+      vlogTitle.style.textDecoration =
+        vlog.titleFormat === "underline" ? "underline" : "none";
+
+      const vlogAuthor = document.getElementById("vlog-author");
+      vlogAuthor.textContent = "Author: " + (vlog.author || "Unknown");
+
+      const vlogDescription = document.getElementById("vlog-description");
+      vlogDescription.textContent =
+        vlog.description + (vlog.quote ? `\n"${vlog.quote}"` : "");
+      vlogDescription.style.fontFamily = vlog.fontStyle || "inherit";
+    } else {
+      document.getElementById("vlog-title").textContent = "Vlog not found";
+      document.getElementById("vlog-description").textContent =
+        "The requested vlog could not be found.";
+      document.getElementById("vlog-author").textContent = "";
+      document.getElementById("vlog-image").style.display = "none";
+    }
+  </script>
+</body>
+
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Vlog Submission Form</title>
+  <link rel="stylesheet" href=".././_res/CSS/style.css" />
+  <script src="https://cdn.ckedito
+  r.com/4.16.2/standard/ckeditor.js"></script>
+</head>
+
+<body>
+  <div class="container">
+    <img src=".././_res/img/isg_dummy_logo.svg" alt="Logo" />
+    <form id="vlogForm">
+      <h1>Vlog Page</h1>
+      <div class="form-group">
+        <label for="author">Author Name</label>
+        <input type="text" id="author" name="author" placeholder="Your Name" required />
+      </div>
+      <div class="form-group">
+        <label for="title-formatting">Choose Title Format</label>
+        <select id="title-formatting" name="title-formatting">
+          <option value="none">None</option>
+          <option value="bold">Bold</option>
+          <option value="italic">Italic</option>
+          <option value="underline">Underline</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label for="title">Vlog Title</label>
+        <input type="text" id="title" name="title" placeholder="Your Thoughts Matter 👉" required />
+      </div>
+      <div class="form-group">
+        <label for="image">Vlog Image URL</label>
+        <input type="text" id="image" name="image" placeholder="No image Selected" />
+      </div>
+      <div class="form-group">
+        <label for="description">Vlog Description</label>
+        <textarea id="description" name="description" placeholder="What’s on your mind? Share it here 📜"
+          required></textarea>
+      </div>
+      <div class="button-group">
+        <button type="submit" class="submit-btn">Submit</button>
+        <button type="button" class="edit-btn" onclick="window.location.href='showcaseContent.html'">
+          View
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <script>
+    // Initialize CKEditor for the description textarea
+    CKEDITOR.replace("description");
+
+    document
+      .getElementById("vlogForm")
+      .addEventListener("submit", function (event) {
+        event.preventDefault();
+
+        const title = document.getElementById("title").value;
+        const titleFormat = document.getElementById("title-formatting").value;
+        const image = document.getElementById("image").value;
+        const author = document.getElementById("author").value;
+
+
+        const description = CKEDITOR.instances.description.getData();
+
+        const vlog = {
+          title: title,
+          description: description, // Rich text data
+          titleFormat: titleFormat,
+          image: image,
+          author: author,
+        };
+
+        const vlogs = JSON.parse(localStorage.getItem("vlogs")) || [];
+        vlogs.push(vlog);
+        localStorage.setItem("vlogs", JSON.stringify(vlogs));
+        window.location.href = "showcaseContent.html";
+      });
+  </script>
+</body>
+
+</html>
